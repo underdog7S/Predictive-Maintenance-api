@@ -7,10 +7,9 @@ import smtplib
 from email.message import EmailMessage
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-
 from dotenv import load_dotenv  
-load_dotenv()                  
 
+load_dotenv()                  
 
 # Feature names used in the model
 FEATURE_NAMES = [
@@ -43,7 +42,7 @@ def send_alert_email(to_email: str, subject: str, body: str):
     smtp_server = "smtp.gmail.com"
     smtp_port = 587
     sender_email = os.getenv("EMAIL_ADDRESS")
-    sender_password = os.getenv("EMAIL_PASSWORD")  # Use secure env variable
+    sender_password = os.getenv("EMAIL_PASSWORD")
 
     if not sender_email or not sender_password:
         print("⚠️ Email credentials are not set in environment variables.")
@@ -93,7 +92,6 @@ def predict(data: InputData):
         raise HTTPException(status_code=400, detail="Invalid product_type. Use L, M, or H.")
 
     try:
-        # Convert °C to Kelvin
         air_temp_K = data.air_temperature + 273.15
         process_temp_K = data.process_temperature + 273.15
 
@@ -115,7 +113,6 @@ def predict(data: InputData):
         prediction = model.predict(input_df)[0]
         proba = model.predict_proba(input_df)[0] if hasattr(model, "predict_proba") else None
 
-        # Send alert if failure probability is high
         if proba is not None and proba[1] > 0.5:
             subject = "⚠️ Predictive Maintenance Alert: High Failure Probability"
             body = (
@@ -134,3 +131,8 @@ def predict(data: InputData):
     except Exception as e:
         print(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Prediction error: {str(e)}")
+
+# ✅ Add this block for local dev & Railway deployment
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=8000)
