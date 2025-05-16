@@ -1,5 +1,6 @@
 ﻿fastapi
 uvicorn
+python-dotenv
 pydantic
 pandas
 numpy
@@ -8,5 +9,5 @@ matplotlib
 seaborn
 joblib
 streamlit
-python-dotenv
+
 
